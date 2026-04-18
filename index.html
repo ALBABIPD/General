@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<!-- saved from url=(0063)file:///C:/Users/ricca/Downloads/spectroscope-inventory_12.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Specto Inventory Management</title>
+
+<link href="./index_files/css2" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f3ee;
+    --surface: #ffffff;
+    --surface2: #f0ede6;
+    --border: #ddd9d0;
+    --border2: #c8c3b8;
+    --text: #1a1814;
+    --text2: #6b6760;
+    --text3: #9c9890;
+    --accent: #2d4a3e;
+    --accent-light: #e8f0ed;
+    --accent2: #8b4513;
+    --warn: #92400e;
+    --warn-bg: #fef3c7;
+    --danger: #991b1b;
+    --danger-bg: #fee2e2;
+    --ok: #14532d;
+    --ok-bg: #dcfce7;
+    --mono: 'DM Mono', monospace;
+    --serif: 'Fraunces', serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--mono); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 13px; }
+
+  /* AUTH SCREEN */
+  #auth-screen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: var(--bg);
+  }
+  .auth-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 2px;
+    padding: 3rem 3.5rem; text-align: center; max-width: 420px; width: 90%;
+  }
+  .auth-card h1 { font-family: var(--serif); font-weight: 300; font-size: 28px; color: var(--text); margin-bottom: 6px; letter-spacing: -0.5px; }
+  .auth-card .sub { font-size: 12px; color: var(--text3); margin-bottom: 2.5rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .auth-card .desc { font-size: 12px; color: var(--text2); line-height: 1.7; margin-bottom: 2rem; }
+  .ms-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--accent); color: #fff; border: none; border-radius: 2px;
+    padding: 11px 24px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em;
+    cursor: pointer; text-transform: uppercase; transition: opacity .15s;
+  }
+  .ms-btn:hover { opacity: .85; }
+  .ms-btn svg { width: 18px; height: 18px; }
+
+  /* APP LAYOUT */
+  #app-screen { display: none; min-height: 100vh; }
+  header {
+    background: #0d0d0d; color: #fff; padding: 0 1.5rem;
+    display: flex; align-items: center; justify-content: space-between; height: 56px;
+    position: sticky; top: 0; z-index: 50;
+  }
+  header .brand { display: flex; align-items: center; gap: 14px; }
+  header .logo { height: 38px; width: auto; }
+
+  header .right { display: flex; align-items: center; gap: 16px; }
+  header .user { font-size: 11px; opacity: .7; letter-spacing: 0.04em; }
+  .sign-out { font-size: 11px; opacity: .6; cursor: pointer; text-decoration: underline; letter-spacing: 0.04em; background: none; border: none; color: #fff; }
+  .sign-out:hover { opacity: 1; }
+  .sync-btn {
+    font-size: 11px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; padding: 5px 12px; border-radius: 2px; cursor: pointer; font-family: var(--mono);
+    letter-spacing: 0.04em; transition: background .15s;
+  }
+  .sync-btn:hover { background: rgba(255,255,255,0.25); }
+
+  .main { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
+  .tab {
+    padding: 10px 20px; font-size: 11px; cursor: pointer; border: none; background: none;
+    color: var(--text3); border-bottom: 2px solid transparent; font-family: var(--mono);
+    letter-spacing: 0.08em; text-transform: uppercase; transition: all .15s; margin-bottom: -1px;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab:hover:not(.active) { color: var(--text2); }
+
+  /* STATS */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 2px; padding: 1rem 1.25rem; }
+  .stat-label { font-size: 10px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .stat-value { font-size: 26px; font-family: var(--serif); font-weight: 300; color: var(--text); }
+  .stat-value.warn { color: var(--warn); }
+  .stat-value.danger { color: var(--danger); }
+
+  /* TOOLBAR */
+  .toolbar { display: flex; gap: 8px; margin-bottom: 1rem; align-items: center; flex-wrap: wrap; }
+  .toolbar input[type=text] {
+    flex: 1; min-width: 200px; height: 34px; font-size: 12px; padding: 0 12px;
+    border: 1px solid var(--border); border-radius: 2px; background: var(--surface);
+    color: var(--text); font-family: var(--mono); letter-spacing: 0.02em;
+  }
+  .toolbar input:focus { outline: none; border-color: var(--accent); }
+  select {
+    height: 34px; padding: 0 10px; border: 1px solid var(--border); border-radius: 2px;
+    font-size: 12px; background: var(--surface); color: var(--text); font-family: var(--mono);
+  }
+  .btn {
+    height: 34px; padding: 0 14px; font-size: 11px; border: 1px solid var(--border2);
+    border-radius: 2px; cursor: pointer; background: var(--surface); color: var(--text2);
+    font-family: var(--mono); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+    transition: all .15s;
+  }
+  .btn:hover { background: var(--surface2); color: var(--text); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { opacity: .85; }
+  .btn.warn-btn { color: var(--warn); border-color: var(--border); }
+  .btn.danger-btn { color: var(--danger); border-color: var(--border); }
+
+  /* TABLE */
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 2px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+  th {
+    text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 500; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+
+  /* BADGES */
+  .ac-wrap { position: relative; }
+  .ac-list { position: absolute; top: 100%; left: 0; right: 0; background: var(--surface);
+    border: 1px solid var(--border2); border-top: none; z-index: 300; max-height: 160px;
+    overflow-y: auto; border-radius: 0 0 2px 2px; }
+  .ac-item { padding: 7px 10px; font-size: 12px; cursor: pointer; color: var(--text); }
+  .ac-item:hover { background: var(--surface2); }
+  .product-checks { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0; }
+  .product-check { display: flex; align-items: center; gap: 6px; font-size: 12px;
+    color: var(--text); cursor: pointer; }
+  .product-check input { cursor: pointer; }
+  .prod-badge { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 2px;
+    background: #e8f0ed; color: #2d4a3e; margin-right: 3px; }
+  .badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 2px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+  .badge.ok { background: var(--ok-bg); color: var(--ok); }
+  .badge.low { background: var(--warn-bg); color: var(--warn); }
+  .badge.out { background: var(--danger-bg); color: var(--danger); }
+  .badge.cat { background: var(--surface2); color: var(--text2); }
+  .badge.shipped { background: var(--surface2); color: var(--text2); }
+  .badge.reserved { background: var(--warn-bg); color: var(--warn); }
+  .badge.instock { background: var(--ok-bg); color: var(--ok); }
+
+  /* QTY CTRL */
+  .qty-ctrl { display: flex; align-items: center; gap: 4px; }
+  .qty-btn {
+    width: 22px; height: 22px; border: 1px solid var(--border2); border-radius: 2px;
+    cursor: pointer; background: var(--surface); color: var(--text); font-size: 14px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .1s;
+  }
+  .qty-btn:hover { background: var(--surface2); }
+  .qty-num { min-width: 28px; text-align: center; font-size: 13px; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(26,24,20,0.5); display: flex; align-items: flex-start;
+    justify-content: center; padding-top: 60px; z-index: 200;
+  }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 2px;
+    padding: 2rem; width: 600px; max-width: 96%; max-height: 80vh; overflow-y: auto;
+  }
+  .modal h3 { font-family: var(--serif); font-weight: 300; font-size: 20px; margin-bottom: 1.5rem; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+  .form-group input, .form-group select, .form-group textarea {
+    height: 34px; padding: 0 10px; border: 1px solid var(--border); border-radius: 2px;
+    font-size: 12px; background: var(--surface); color: var(--text); font-family: var(--mono);
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
+  .form-group textarea { height: 72px; padding: 8px 10px; resize: vertical; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+
+  /* TOAST */
+  #toast {
+    position: fixed; bottom: 24px; right: 24px; background: var(--accent); color: #fff;
+    padding: 10px 18px; border-radius: 2px; font-size: 12px; letter-spacing: 0.04em;
+    opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 300;
+  }
+  #toast.show { opacity: 1; }
+  #toast.error { background: var(--danger); }
+
+  /* STATUS */
+  .status-bar { font-size: 11px; color: var(--text3); margin-bottom: 1rem; letter-spacing: 0.04em; }
+  .empty { text-align: center; padding: 3rem; color: var(--text3); font-size: 12px; letter-spacing: 0.04em; }
+
+  /* LOADING */
+  .loading { text-align: center; padding: 3rem; color: var(--text3); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+<script src="./index_files/msal-browser.min.js.download"></script></head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <h1>Specto Inventory Management</h1>
+    <div class="sub">Stock management system</div>
+    <p class="desc">Ready. Sign in with your Microsoft 365 account to access your inventory.</p>
+    <button class="ms-btn" onclick="signIn()" style="opacity: 1;">
+      <svg viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="9" height="9" fill="#f25022"></rect>
+        <rect x="11" y="1" width="9" height="9" fill="#7fba00"></rect>
+        <rect x="1" y="11" width="9" height="9" fill="#00a4ef"></rect>
+        <rect x="11" y="11" width="9" height="9" fill="#ffb900"></rect>
+      </svg>
+      Sign in with Microsoft
+    </button>
+  </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="app-screen">
+  <header>
+    <div class="brand">
+      <img src="data:image/png;base64,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" class="logo" alt="Specto logo">
+      <div style="border-left:1px solid #333;padding-left:14px">
+        <div style="font-family:var(--serif);font-weight:300;font-size:15px;color:#fff;letter-spacing:0.05em">SPECTO PHOTONICS</div>
+        <div style="font-size:10px;color:#888;letter-spacing:0.12em;text-transform:uppercase;margin-top:1px">Inventory Management</div>
+      </div>
+    </div>
+    <div class="right">
+      <button class="sync-btn" onclick="syncAll()">↻ Sync with OneDrive</button>
+      <span class="user" id="user-name"></span>
+      <button class="sign-out" onclick="signOut()">Sign out</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(&#39;raw&#39;)">Raw materials</button>
+      <button class="tab" onclick="switchTab(&#39;finished&#39;)">Finished units</button>
+      <button class="tab" onclick="switchTab(&#39;settings&#39;)">⚙ Products</button>
+    </div>
+
+    <!-- RAW MATERIALS -->
+    <div id="raw-section">
+      <div class="stats" id="raw-stats"></div>
+      <div class="toolbar">
+        <input type="text" id="raw-search" placeholder="Search components, supplier, ID..." oninput="renderRaw()">
+        <select id="raw-cat-filter" onchange="renderRaw()">
+          <option value="">All categories</option>
+        </select>
+        <button class="btn warn-btn" id="low-btn" onclick="toggleLow()">Low stock only</button>
+        <button class="btn primary" onclick="openAddRaw()">+ Add component</button>
+      </div>
+      <div class="status-bar" id="raw-status"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th style="width:150px">Component</th>
+            <th style="width:100px">Products</th>
+            <th style="width:80px">Category</th>
+            <th style="width:80px">Stock</th>
+            <th style="width:60px">On order</th>
+            <th style="width:55px">Unit</th>
+            <th style="width:75px">Status</th>
+            <th style="width:110px">Supplier</th>
+            <th style="width:70px">Lead (days)</th>
+            <th style="width:70px">Specto ID</th>
+            <th style="width:75px">Unit cost</th>
+            <th style="width:80px">Responsible</th>
+            <th style="width:110px">Actions</th>
+          </tr></thead>
+          <tbody id="raw-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FINISHED UNITS -->
+    <div id="finished-section" style="display:none">
+      <div class="stats" id="fin-stats"></div>
+      <div class="toolbar">
+        <input type="text" id="fin-search" placeholder="Search serial, model..." oninput="renderFin()">
+        <select id="fin-status-filter" onchange="renderFin()">
+          <option value="">All statuses</option>
+          <option>In stock</option>
+          <option>Reserved</option>
+          <option>Shipped</option>
+        </select>
+        <button class="btn primary" onclick="openAddFin()">+ Add unit</button>
+      </div>
+      <div class="status-bar" id="fin-status"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th style="width:180px">Serial</th>
+            <th style="width:100px">Product</th>
+            <th style="width:80px">Status</th>
+            <th style="width:80px">Purpose</th>
+            <th style="width:100px">Assembly</th>
+            <th style="width:70px">Colour</th>
+            <th style="width:100px">Location</th>
+            <th style="width:100px">Warranty</th>
+            <th>Notes</th>
+            <th style="width:110px">Actions</th>
+          </tr></thead>
+          <tbody id="fin-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONTAINER -->
+<div id="settings-section" style="display:none">
+  <div style="max-width:600px">
+    <div style="margin-bottom:1rem">
+      <h3 style="font-family:var(--serif);font-weight:300;font-size:18px;margin-bottom:.5rem">Product portfolio</h3>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:1rem">Define your products here. The prefix is used to auto-generate Specto IDs for raw materials.</p>
+    </div>
+    <div id="products-list" style="margin-bottom:1rem"></div>
+    <button class="btn primary" style="height:34px" onclick="addProductRow()">+ Add product</button>
+    <button class="btn" style="height:34px;margin-left:8px" onclick="saveProducts()">Save products</button>
+    <div style="font-size:11px;color:var(--text3);margin-top:.75rem" id="products-save-status"></div>
+  </div>
+</div>
+
+<div id="modal-container"></div>
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const CLIENT_ID      = '4f8f7cbb-b49b-4daa-8d2b-b81321c2a8b6';
+const TENANT_ID      = '5cb4b083-ca81-4c30-b490-ef1a026a45af';
+const SP_HOSTNAME    = 'spectophotonicscom.sharepoint.com';
+const SP_DRIVE_NAME  = 'Documenti condivisi';
+const SP_FOLDER      = '00. Amministrazione & Contabilità/5. Centro Acquisti/5.5 Inventory';
+const RAW_FILENAME   = 'specto-raw-materials.csv';
+const FIN_FILENAME   = 'specto-finished-units.csv';
+
+const SCOPES = ['Files.ReadWrite', 'User.Read', 'Sites.ReadWrite.All'];
+const PRODUCTS_FILENAME = 'specto-products.json';
+
+// Default products - loaded from SharePoint, editable via Settings
+let PRODUCTS = [
+  { id: 'BIPD', name: 'BIPD Filter', prefix: 'BIP' },
+  { id: 'ALBA', name: 'ALBA Spectrometer', prefix: 'ALB' },
+];
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let rawItems = [], finItems = [], showingLow = false, usedSerials = new Set();
+let fileId = null;
+let accessToken = null;
+let nextRawNum = 1, nextFinNum = 1;
+
+async function getToken() {
+  const account = msalInstance.getActiveAccount();
+  if (!account) throw new Error('Not signed in');
+  const result = await msalInstance.acquireTokenSilent({ scopes: SCOPES, account });
+  return result.accessToken;
+}
+
+async function initApp(account) {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  document.getElementById('user-name').textContent = account.name || account.username;
+  accessToken = await getToken();
+  await loadOrCreateExcelFile();
+}
+
+// ── GRAPH API ────────────────────────────────────────────────────────────────
+async function graph(method, path, body) {
+  accessToken = await getToken();
+  const res = await fetch(`https://graph.microsoft.com/v1.0${path}`, {
+    method,
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Graph API error ${res.status}`);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+// ── EXCEL FILE SETUP ─────────────────────────────────────────────────────────
+let spSiteId = null;
+let spDriveId = null;
+
+async function getSharePointIds() {
+  if (spSiteId && spDriveId) return;
+  setRawStatus('Resolving SharePoint site...');
+  // Try both with and without /sites/ prefix - communication sites are often at root
+  let site;
+  try {
+    site = await graph('GET', `/sites/${SP_HOSTNAME}:/`);
+  } catch(e) {
+    // fallback: search for the site
+    const results = await graph('GET', `/sites?search=*`);
+    site = results.value[0];
+  }
+  spSiteId = site.id;
+  setRawStatus('Resolving document library...');
+  const drives = await graph('GET', `/sites/${spSiteId}/drives`);
+  // Find Shared Documents / Documents library
+  console.log('Available drives:', drives.value.map(d => d.name));
+  const docLib = drives.value.find(d =>
+    d.name === SP_DRIVE_NAME ||
+    d.name === 'Documents' ||
+    d.name === 'Shared Documents' ||
+    d.driveType === 'documentLibrary'
+  );
+  spDriveId = (docLib || drives.value[0]).id;
+  console.log('SharePoint resolved:', { spSiteId, spDriveId, driveName: (docLib||drives.value[0]).name });
+}
+
+async function loadOrCreateExcelFile() {
+  try {
+    // Step 1: resolve site
+    setRawStatus('Step 1/4 — Resolving SharePoint site...');
+    let site;
+    try {
+      site = await graph('GET', `/sites/${SP_HOSTNAME}:/`);
+    } catch(e) {
+      const r = await graph('GET', `/sites?search=*`);
+      site = r.value[0];
+    }
+    spSiteId = site.id;
+    setRawStatus('Step 2/4 — Finding document library...');
+
+    // Step 2: list drives and pick the right one
+    const drives = await graph('GET', `/sites/${spSiteId}/drives`);
+    const driveNames = drives.value.map(d => d.name).join(', ');
+    setRawStatus(`Step 2/4 — Found libraries: ${driveNames}`);
+
+    const docLib = drives.value.find(d => d.name === SP_DRIVE_NAME)
+      || drives.value.find(d => d.driveType === 'documentLibrary')
+      || drives.value[0];
+    spDriveId = docLib.id;
+    setRawStatus(`Step 3/4 — Using library: "${docLib.name}" — looking for file...`);
+
+    // Step 3: find or create the file
+    const folderSegments = SP_FOLDER.split('/').map(s => encodeURIComponent(s)).join('/');
+    const filePath = `${folderSegments}/${RAW_FILENAME}`;
+    setRawStatus(`Step 3/4 — Looking for CSV files in SharePoint folder...`);
+
+    try {
+      const file = await graph('GET', `/drives/${spDriveId}/root:/${filePath}`);
+      fileId = file.id;
+      setRawStatus('Step 4/4 — File found! Loading data...');
+      await loadSheets();
+    } catch(e) {
+      setRawStatus(`Step 3/4 — File not found (${e.message}), creating...`);
+        await createExcelFile();
+    }
+    await loadData();
+  } catch(e) {
+    setRawStatus('❌ Error at: ' + e.message);
+    showToast('Error: ' + e.message, true);
+  }
+}
+
+async function createExcelFile() {
+  showToast('Creating inventory files on SharePoint...');
+  const rawCsv = 'OurID,Name,Products,Category,Qty,OnOrder,MinQty,Unit,UnitCost,Colour,Supplier,SupplierContact,SupplierCode,ProductLink,LeadTimeDays,Location,Responsible,Notes,LastModified\n';
+  const finCsv = 'Serial,ProductId,Status,AssemblyDate,Colour,Purpose,Location,WarrantyExpiry,NotesInternal,NotesExternal,LastModified\n';
+  await uploadCSV(RAW_FILENAME, rawCsv);
+  await uploadCSV(FIN_FILENAME, finCsv);
+  showToast('Inventory files created on SharePoint!');
+}
+
+async function uploadCSV(filename, csvContent) {
+  const folderSegments = SP_FOLDER.split('/').map(s => encodeURIComponent(s)).join('/');
+  const token = await getToken();
+  const res = await fetch(`https://graph.microsoft.com/v1.0/drives/${spDriveId}/root:/${folderSegments}/${filename}:/content`, {
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'text/csv' },
+    body: csvContent
+  });
+  if (!res.ok) throw new Error(`Failed to upload ${filename}: ${res.status}`);
+  return res.json();
+}
+
+async function downloadCSV(filename) {
+  const folderSegments = SP_FOLDER.split('/').map(s => encodeURIComponent(s)).join('/');
+  const token = await getToken();
+  const res = await fetch(`https://graph.microsoft.com/v1.0/drives/${spDriveId}/root:/${folderSegments}/${filename}:/content`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error(`Failed to download ${filename}: ${res.status}`);
+  return res.text();
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n').map(l => l.split(',').map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"')));
+  return lines;
+}
+
+function toCSVRow(arr) {
+  return arr.map(v => {
+    const s = String(v === null || v === undefined ? '' : v);
+    return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
+  }).join(',');
+}
+
+async function loadSheets() { /* not needed for CSV approach */ }
+
+async function loadData() {
+  setRawStatus('Loading data from SharePoint...');
+  // Try to load products config
+  try {
+    const prodJson = await downloadCSV('specto-products.json');
+    const parsed = JSON.parse(prodJson);
+    if (Array.isArray(parsed) && parsed.length) PRODUCTS = parsed;
+  } catch(e) { /* use defaults */ }
+  try {
+    // Load raw materials CSV
+    const rawText = await downloadCSV(RAW_FILENAME);
+    const rawRows = parseCSV(rawText);
+    rawItems = [];
+    for (let i = 1; i < rawRows.length; i++) {
+      const r = rawRows[i];
+      if (!r[0] && !r[1]) continue;
+      rawItems.push({ id:r[0]||'', name:r[1]||'', category:r[2]||'', qty:Number(r[3])||0, minQty:Number(r[4])||5, unit:r[5]||'pcs', unitCost:Number(r[6])||0, colour:r[7]||'', supplier:r[8]||'', supplierContact:r[9]||'', supplierCode:r[10]||'', leadTime:r[11]||'', location:r[12]||'', notes:r[13]||'' });
+    }
+    // Load finished units CSV
+    const finText = await downloadCSV(FIN_FILENAME);
+    const finRows = parseCSV(finText);
+    finItems = [];
+    for (let i = 1; i < finRows.length; i++) {
+      const r = finRows[i];
+      if (!r[0]) continue;
+      finItems.push({ serial:r[0]||'', productId:r[1]||'', status:r[2]||'In stock', assemblyDate:r[3]||'', colour:r[4]||'', purpose:r[5]||'For sale', location:r[6]||'', warrantyExpiry:r[7]||'', notesInternal:r[8]||'', notesExternal:r[9]||'', lastModified:r[10]||'' }); usedSerials.add(r[0]);
+    }
+    computeNextIds();
+    renderRaw(); renderFin();
+    setRawStatus(`Last synced: ${new Date().toLocaleTimeString()}`);
+    showToast('Data loaded from SharePoint');
+  } catch(e) {
+    setRawStatus('Load error: ' + e.message);
+    showToast('Load error: ' + e.message, true);
+  }
+}
+
+async function saveRawToExcel() {
+  const rows = [['OurID','Name','Products','Category','Qty','OnOrder','MinQty','Unit','UnitCost','Colour','Supplier','SupplierContact','SupplierCode','ProductLink','LeadTimeDays','Location','Responsible','Notes','LastModified']];
+  rawItems.forEach(i => rows.push([i.id,i.name,(i.products||[]).join('|'),i.category,i.qty,i.onOrder||0,i.minQty,i.unit,i.unitCost,i.colour,i.supplier,i.supplierContact,i.supplierCode,i.productLink||'',i.leadTimeDays||0,i.location,i.responsible||'',i.notes,i.lastModified||'']));
+  const csv = rows.map(toCSVRow).join('\n');
+  try {
+    await uploadCSV(RAW_FILENAME, csv);
+    setRawStatus(`Saved to SharePoint · ${new Date().toLocaleTimeString()}`);
+  } catch(e) { showToast('Save error: ' + e.message, true); }
+}
+
+async function saveFinToExcel() {
+  const rows = [['Serial','ProductId','Status','AssemblyDate','Colour','Purpose','Location','WarrantyExpiry','NotesInternal','NotesExternal','LastModified']];
+  finItems.forEach(i => rows.push([i.serial,i.productId||'',i.status,i.assemblyDate,i.colour,i.purpose||'',i.location||'',i.warrantyExpiry||'',i.notesInternal||'',i.notesExternal||'',i.lastModified||'']));
+  const csv = rows.map(toCSVRow).join('\n');
+  try {
+    await uploadCSV(FIN_FILENAME, csv);
+    setFinStatus(`Saved to SharePoint · ${new Date().toLocaleTimeString()}`);
+  } catch(e) { showToast('Save error: ' + e.message, true); }
+}
+
+async function syncAll() { await loadData(); }
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function computeNextIds() {
+  rawItems.forEach(i => {
+    const n = parseInt((i.id||'').replace(/\D/g,''));
+    if (!isNaN(n) && n >= nextRawNum) nextRawNum = n + 1;
+  });
+  finItems.forEach(i => {
+    const n = parseInt((i.serial||'').replace(/\D/g,''));
+    if (!isNaN(n) && n >= nextFinNum) nextFinNum = n + 1;
+  });
+}
+function padNum(n, len=3) { return String(n).padStart(len,'0'); }
+function newRawId() { return `R${padNum(nextRawNum++)}`; }
+function newSerial() { return `SPEC-${new Date().getFullYear()}-${padNum(nextFinNum++)}`; }
+function setRawStatus(t) { document.getElementById('raw-status').textContent = t; }
+function setFinStatus(t) { document.getElementById('fin-status').textContent = t; }
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (isError ? ' error' : '');
+  setTimeout(() => t.className = '', 2800);
+}
+
+function switchTab(tab) {
+  document.getElementById('raw-section').style.display = tab === 'raw' ? '' : 'none';
+  document.getElementById('finished-section').style.display = tab === 'finished' ? '' : 'none';
+  document.getElementById('settings-section').style.display = tab === 'settings' ? '' : 'none';
+  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active',
+    (tab==='raw'&&i===0)||(tab==='finished'&&i===1)||(tab==='settings'&&i===2)));
+  if (tab === 'settings') renderProductsList();
+}
+
+function renderProductsList() {
+  const list = document.getElementById('products-list');
+  list.innerHTML = PRODUCTS.map((p,i) => `
+    <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+      <input value="${p.name}" placeholder="Product name" style="flex:2;height:34px;padding:0 10px;border:1px solid var(--border);border-radius:2px;font-size:12px;background:var(--surface);color:var(--text);font-family:var(--mono)" id="prod-name-${i}">
+      <input value="${p.id}" placeholder="ID (e.g. ALBA)" style="flex:1;height:34px;padding:0 10px;border:1px solid var(--border);border-radius:2px;font-size:12px;background:var(--surface);color:var(--text);font-family:var(--mono)" id="prod-id-${i}" maxlength="6">
+      <input value="${p.prefix}" placeholder="Prefix (e.g. ALB)" style="flex:1;height:34px;padding:0 10px;border:1px solid var(--border);border-radius:2px;font-size:12px;background:var(--surface);color:var(--text);font-family:var(--mono)" id="prod-prefix-${i}" maxlength="5">
+      <button class="btn danger-btn" style="height:34px;padding:0 10px;font-size:11px" onclick="removeProductRow(${i})">Remove</button>
+    </div>`).join('') + `<div style="font-size:11px;color:var(--text3);margin-top:4px">Name · ID (used in serials) · Prefix (used in Specto IDs)</div>`;
+}
+
+function addProductRow() {
+  PRODUCTS.push({ id:'NEW', name:'New Product', prefix:'NEW' });
+  renderProductsList();
+}
+
+function removeProductRow(i) {
+  PRODUCTS.splice(i,1);
+  renderProductsList();
+}
+
+async function saveProducts() {
+  const count = PRODUCTS.length;
+  PRODUCTS = [];
+  for (let i=0; i<count; i++) {
+    const name = document.getElementById('prod-name-'+i)?.value.trim();
+    const id = document.getElementById('prod-id-'+i)?.value.trim().toUpperCase();
+    const prefix = document.getElementById('prod-prefix-'+i)?.value.trim().toUpperCase();
+    if (name && id && prefix) PRODUCTS.push({ id, name, prefix });
+  }
+  try {
+    await uploadCSV('specto-products.json', JSON.stringify(PRODUCTS));
+    document.getElementById('products-save-status').textContent = 'Saved · ' + new Date().toLocaleTimeString();
+  } catch(e) { document.getElementById('products-save-status').textContent = 'Save error: ' + e.message; }
+  renderProductsList();
+}
+
+function toggleLow() {
+  showingLow = !showingLow;
+  document.getElementById('low-btn').style.background = showingLow ? 'var(--warn-bg)' : '';
+  document.getElementById('low-btn').style.color = showingLow ? 'var(--warn)' : '';
+  renderRaw();
+}
+
+// ── RENDER RAW ────────────────────────────────────────────────────────────────
+function stockBadge(qty, min) {
+  if (qty === 0) return '<span class="badge out">Out of stock</span>';
+  if (qty < min) return '<span class="badge low">Low stock</span>';
+  return '<span class="badge ok">OK</span>';
+}
+
+function renderRaw() {
+  const q = (document.getElementById('raw-search')?.value||'').toLowerCase();
+  const cat = document.getElementById('raw-cat-filter')?.value||'';
+  let items = rawItems.filter(i => {
+    const mQ = !q || i.name.toLowerCase().includes(q) || i.id.toLowerCase().includes(q) || i.supplier.toLowerCase().includes(q) || i.supplierCode.toLowerCase().includes(q);
+    const mC = !cat || i.category === cat;
+    const mL = !showingLow || i.qty < i.minQty;
+    return mQ && mC && mL;
+  });
+
+  // Stats
+  const low = rawItems.filter(i => i.qty > 0 && i.qty < i.minQty).length;
+  const out = rawItems.filter(i => i.qty === 0).length;
+  const val = rawItems.reduce((a,i) => a + i.qty * i.unitCost, 0);
+  document.getElementById('raw-stats').innerHTML = `
+    <div class="stat"><div class="stat-label">Total components</div><div class="stat-value">${rawItems.length}</div></div>
+    <div class="stat"><div class="stat-label">Low stock alerts</div><div class="stat-value warn">${low}</div></div>
+    <div class="stat"><div class="stat-label">Out of stock</div><div class="stat-value danger">${out}</div></div>
+    <div class="stat"><div class="stat-label">Inventory value</div><div class="stat-value">€${val.toFixed(2)}</div></div>`;
+
+  // Category filter
+  const cats = [...new Set(rawItems.map(i => i.category).filter(Boolean))].sort();
+  const sel = document.getElementById('raw-cat-filter');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option${c===cur?' selected':''}>${c}</option>`).join('');
+
+  const tb = document.getElementById('raw-tbody');
+  if (!items.length) { tb.innerHTML = `<tr><td colspan="12"><div class="empty">No components found</div></td></tr>`; return; }
+  tb.innerHTML = items.map(i => {
+    const prodBadges = (i.products||[]).map(pid => {
+      const p = PRODUCTS.find(p => p.id === pid);
+      return p ? `<span class="prod-badge">${p.id}</span>` : '';
+    }).join('');
+    const linkIcon = i.productLink ? `<a href="${i.productLink}" target="_blank" style="font-size:10px;color:var(--accent);text-decoration:none;margin-left:4px">↗</a>` : '';
+    return `<tr>
+    <td title="${i.name}">${i.name}${linkIcon}</td>
+    <td>${prodBadges||'—'}</td>
+    <td><span class="badge cat">${i.category||'—'}</span></td>
+    <td><div class="qty-ctrl">
+      <button class="qty-btn" onclick="changeRawQty('${i.id}',-1)">−</button>
+      <span class="qty-num">${i.qty}</span>
+      <button class="qty-btn" onclick="changeRawQty('${i.id}',1)">+</button>
+    </div></td>
+    <td style="color:var(--text2)">${i.onOrder||0}</td>
+    <td>${i.unit}</td>
+    <td>${stockBadge(i.qty, i.minQty)}</td>
+    <td title="${i.supplier}">${i.supplier||'—'}</td>
+    <td>${i.leadTimeDays||'—'}</td>
+    <td style="font-size:11px">${i.id}</td>
+    <td>€${Number(i.unitCost).toFixed(2)}</td>
+    <td style="font-size:11px" title="${i.responsible||''}">${i.responsible||'—'}</td>
+    <td>
+      <button class="btn" style="height:26px;padding:0 8px;font-size:10px" onclick="openEditRaw('${i.id}')">Edit</button>
+      <button class="btn danger-btn" style="height:26px;padding:0 8px;font-size:10px" onclick="deleteRaw('${i.id}')">Del</button>
+    </td>
+  </tr>`;}).join('');
+}
+
+async function changeRawQty(id, delta) {
+  const item = rawItems.find(i => i.id === id);
+  if (item) {
+    item.qty = Math.max(0, item.qty + delta);
+    renderRaw();
+    await saveRawToExcel();
+  }
+}
+
+async function deleteRaw(id) {
+  if (!confirm('Delete this component?')) return;
+  rawItems = rawItems.filter(i => i.id !== id);
+  renderRaw();
+  await saveRawToExcel();
+}
+
+// ── RENDER FINISHED ───────────────────────────────────────────────────────────
+function finBadge(s) {
+  const m = { 'In stock': 'instock', 'Reserved': 'reserved', 'Shipped': 'shipped' };
+  return `<span class="badge ${m[s]||'cat'}">${s}</span>`;
+}
+
+function renderFin() {
+  const q = (document.getElementById('fin-search')?.value||'').toLowerCase();
+  const st = document.getElementById('fin-status-filter')?.value||'';
+  let items = finItems.filter(i => {
+    const mQ = !q || i.serial.toLowerCase().includes(q) || i.model.toLowerCase().includes(q) || (i.notes||'').toLowerCase().includes(q);
+    const mS = !st || i.status === st;
+    return mQ && mS;
+  });
+  const inStock = finItems.filter(i => i.status === 'In stock').length;
+  const reserved = finItems.filter(i => i.status === 'Reserved').length;
+  const shipped = finItems.filter(i => i.status === 'Shipped').length;
+  document.getElementById('fin-stats').innerHTML = `
+    <div class="stat"><div class="stat-label">Total units</div><div class="stat-value">${finItems.length}</div></div>
+    <div class="stat"><div class="stat-label">In stock</div><div class="stat-value">${inStock}</div></div>
+    <div class="stat"><div class="stat-label">Reserved</div><div class="stat-value warn">${reserved}</div></div>
+    <div class="stat"><div class="stat-label">Shipped</div><div class="stat-value">${shipped}</div></div>`;
+  const tb = document.getElementById('fin-tbody');
+  if (!items.length) { tb.innerHTML = `<tr><td colspan="7"><div class="empty">No units found</div></td></tr>`; return; }
+  tb.innerHTML = items.map(i => {
+    const prod = PRODUCTS.find(p => p.id === i.productId);
+    const purposeBadge = i.purpose === 'Demo'
+      ? '<span class="badge low">Demo</span>'
+      : '<span class="badge cat">For sale</span>';
+    return `<tr>
+    <td style="font-size:11px;font-family:var(--mono)">${i.serial}</td>
+    <td>${prod ? `<span class="badge cat">${prod.name}</span>` : '—'}</td>
+    <td>${finBadge(i.status)}</td>
+    <td>${purposeBadge}</td>
+    <td>${i.assemblyDate||'—'}</td>
+    <td>${i.colour||'—'}</td>
+    <td style="font-size:11px">${i.location||'—'}</td>
+    <td style="font-size:11px">${i.warrantyExpiry||'—'}</td>
+    <td style="color:var(--text2);font-size:11px" title="${i.notesInternal||''}">${i.notesInternal||'—'}</td>
+    <td>
+      <button class="btn" style="height:26px;padding:0 8px;font-size:10px" onclick="openEditFin('${i.serial}')">Edit</button>
+      <button class="btn danger-btn" style="height:26px;padding:0 8px;font-size:10px" onclick="deleteFin('${i.serial}')">Del</button>
+    </td>
+  </tr>`;}).join('');
+}
+
+async function deleteFin(serial) {
+  if (!confirm('Delete this unit?')) return;
+  finItems = finItems.filter(i => i.serial !== serial);
+  renderFin();
+  await saveFinToExcel();
+}
+
+// ── MODALS ────────────────────────────────────────────────────────────────────
+function showModal(html) { document.getElementById('modal-container').innerHTML = `<div class="modal-overlay" onclick="if(event.target.classList.contains('modal-overlay'))closeModal()">${html}</div>`; }
+function closeModal() { document.getElementById('modal-container').innerHTML = ''; }
+
+function rawFormHTML(item) {
+  const v = item || {};
+  const cats = [...new Set(rawItems.map(i => i.category).filter(Boolean))].sort();
+  const sups = [...new Set(rawItems.map(i => i.supplier).filter(Boolean))].sort();
+  const locs = [...new Set(rawItems.map(i => i.location).filter(Boolean))].sort();
+  const resps = [...new Set(rawItems.map(i => i.responsible).filter(Boolean))].sort();
+  const autoId = item ? v.id : generateRawId(v.products);
+
+  const prodChecks = PRODUCTS.map(p => {
+    const checked = (v.products||[]).includes(p.id) ? 'checked' : '';
+    return `<label class="product-check"><input type="checkbox" value="${p.id}" ${checked} onchange="updateAutoId()"> ${p.name}</label>`;
+  }).join('');
+
+  const unitOptions = ['pcs','m','cm','mm','g','kg','ml','L','roll','set','pair','lot'].map(u =>
+    `<option value="${u}"${(v.unit||'pcs')===u?' selected':''}>${u}</option>`).join('');
+
+  return `<div class="modal">
+    <h3>${item ? 'Edit component' : 'Add component'}</h3>
+    <div class="form-grid">
+      <div class="form-group full"><label>Component name *</label><input id="f-name" value="${v.name||''}"></div>
+
+      <div class="form-group full"><label>Products using this component</label>
+        <div class="product-checks" id="f-products">${prodChecks}</div>
+      </div>
+
+      <div class="form-group"><label>Specto ID (auto-generated)</label>
+        <input id="f-id" value="${autoId}" ${item?'readonly':''} style="font-family:var(--mono);letter-spacing:0.05em">
+        <span id="f-id-warn" style="font-size:11px;color:var(--danger);display:none">⚠ ID already in use</span>
+      </div>
+      <div class="form-group"><label>Category</label>
+        <div class="ac-wrap"><input id="f-cat" value="${v.category||''}" placeholder="e.g. Optical, Electronics" autocomplete="off" oninput="showAC('f-cat',${JSON.stringify(cats)})">
+        <div class="ac-list" id="f-cat-ac"></div></div>
+      </div>
+
+      <div class="form-group"><label>Current stock *</label><input id="f-qty" type="number" min="0" value="${v.qty||0}"></div>
+      <div class="form-group"><label>On order / in transit</label><input id="f-onorder" type="number" min="0" value="${v.onOrder||0}"></div>
+      <div class="form-group"><label>Min. stock threshold</label><input id="f-min" type="number" min="0" value="${v.minQty||5}"></div>
+      <div class="form-group"><label>Unit of measure</label>
+        <select id="f-unit">${unitOptions}</select>
+      </div>
+
+      <div class="form-group"><label>Unit cost (€)</label><input id="f-cost" type="number" step="0.01" min="0" value="${v.unitCost||0}"></div>
+      <div class="form-group"><label>Colour / finish</label><input id="f-colour" value="${v.colour||''}"></div>
+
+      <div class="form-group"><label>Supplier name</label>
+        <div class="ac-wrap"><input id="f-sup" value="${v.supplier||''}" autocomplete="off" oninput="showAC('f-sup',${JSON.stringify(sups)})">
+        <div class="ac-list" id="f-sup-ac"></div></div>
+      </div>
+      <div class="form-group"><label>Supplier contact / email</label><input id="f-contact" value="${v.supplierContact||''}"></div>
+      <div class="form-group"><label>Supplier code</label><input id="f-supcode" value="${v.supplierCode||''}"></div>
+      <div class="form-group"><label>Product / supplier link</label><input id="f-link" type="url" value="${v.productLink||''}" placeholder="https://..."></div>
+
+      <div class="form-group"><label>Lead time (days)</label><input id="f-lead" type="number" min="0" value="${v.leadTimeDays||''}" placeholder="e.g. 14"></div>
+      <div class="form-group"><label>Storage location</label>
+        <div class="ac-wrap"><input id="f-loc" value="${v.location||''}" autocomplete="off" oninput="showAC('f-loc',${JSON.stringify(locs)})">
+        <div class="ac-list" id="f-loc-ac"></div></div>
+      </div>
+
+      <div class="form-group full"><label>Responsible (supply chain owner)</label>
+        <div class="ac-wrap"><input id="f-resp" value="${v.responsible||''}" autocomplete="off" oninput="showAC('f-resp',${JSON.stringify(resps)})">
+        <div class="ac-list" id="f-resp-ac"></div></div>
+      </div>
+      <div class="form-group full"><label>Notes</label><textarea id="f-notes">${v.notes||''}</textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn primary" onclick="saveRawItem('${item?item.id:''}')">${item ? 'Save changes' : 'Add component'}</button>
+    </div>
+  </div>`;
+}
+
+function generateRawId(products) {
+  const checked = products || [];
+  const prod = PRODUCTS.find(p => checked.includes(p.id));
+  const prefix = prod ? prod.prefix : 'SPC';
+  // Find next available number for this prefix
+  const existing = rawItems.map(i => i.id).filter(id => id.startsWith(prefix));
+  let num = 1;
+  while (existing.includes(`${prefix}${String(num).padStart(5,'0')}`)) num++;
+  return `${prefix}${String(num).padStart(5,'0')}`;
+}
+
+function updateAutoId() {
+  const checked = [...document.querySelectorAll('#f-products input:checked')].map(el => el.value);
+  const newId = generateRawId(checked);
+  const idField = document.getElementById('f-id');
+  if (idField && !idField.readOnly) idField.value = newId;
+}
+
+function checkIdUnique(id, existingId) {
+  const warn = document.getElementById('f-id-warn');
+  if (!warn) return;
+  const inUse = rawItems.some(i => i.id === id && i.id !== existingId);
+  warn.style.display = inUse ? '' : 'none';
+}
+
+function showAC(fieldId, suggestions) {
+  const input = document.getElementById(fieldId);
+  const listId = fieldId + '-ac';
+  const list = document.getElementById(listId);
+  if (!input || !list) return;
+  const val = input.value.toLowerCase();
+  const matches = suggestions.filter(s => s.toLowerCase().includes(val) && s !== input.value);
+  if (!matches.length || !val) { list.innerHTML = ''; return; }
+  list.innerHTML = matches.slice(0,6).map(s =>
+    `<div class="ac-item" onmousedown="pickAC('${fieldId}','${s.replace(/'/g,"\\'")}')">  ${s}</div>`
+  ).join('');
+}
+
+function pickAC(fieldId, value) {
+  const input = document.getElementById(fieldId);
+  if (input) { input.value = value; document.getElementById(fieldId+'-ac').innerHTML = ''; }
+}
+
+function openAddRaw() { showModal(rawFormHTML(null)); }
+function openEditRaw(id) { showModal(rawFormHTML(rawItems.find(i => i.id === id))); }
+
+async function saveRawItem(existingId) {
+  const id = document.getElementById('f-id').value.trim();
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('Component name is required.'); return; }
+  // Check ID uniqueness
+  const idConflict = rawItems.some(i => i.id === id && i.id !== existingId);
+  if (idConflict) { alert('This Specto ID is already in use. Please use a different ID.'); return; }
+  const products = [...document.querySelectorAll('#f-products input:checked')].map(el => el.value);
+  const data = {
+    id, name,
+    products,
+    category: document.getElementById('f-cat').value.trim(),
+    qty: parseInt(document.getElementById('f-qty').value) || 0,
+    onOrder: parseInt(document.getElementById('f-onorder').value) || 0,
+    minQty: parseInt(document.getElementById('f-min').value) || 5,
+    unit: document.getElementById('f-unit').value,
+    unitCost: parseFloat(document.getElementById('f-cost').value) || 0,
+    colour: document.getElementById('f-colour').value.trim(),
+    supplier: document.getElementById('f-sup').value.trim(),
+    supplierContact: document.getElementById('f-contact').value.trim(),
+    supplierCode: document.getElementById('f-supcode').value.trim(),
+    productLink: document.getElementById('f-link').value.trim(),
+    leadTimeDays: parseInt(document.getElementById('f-lead').value) || 0,
+    location: document.getElementById('f-loc').value.trim(),
+    responsible: document.getElementById('f-resp').value.trim(),
+    notes: document.getElementById('f-notes').value.trim(),
+    lastModified: new Date().toISOString().split('T')[0],
+  };
+  if (existingId) {
+    const idx2 = rawItems.findIndex(i => i.id === existingId);
+    if (idx2 > -1) rawItems[idx2] = data;
+  } else {
+    rawItems.push(data);
+  }
+  closeModal();
+  renderRaw();
+  await saveRawToExcel();
+  showToast('Component saved to SharePoint');
+}
+
+function finFormHTML(item) {
+  const v = item || {};
+  const statuses = ['In stock','Reserved','Shipped'];
+  const prodOptions = PRODUCTS.map(p =>
+    `<option value="${p.id}"${v.productId===p.id?' selected':''}>${p.name}</option>`
+  ).join('');
+  const autoSerial = item ? v.serial : generateSerial(v.productId||PRODUCTS[0].id);
+  return `<div class="modal">
+    <h3>${item ? 'Edit unit' : 'Add finished unit'}</h3>
+    <div class="form-grid">
+      <div class="form-group"><label>Product *</label>
+        <select id="ff-product" onchange="updateAutoSerial()">${prodOptions}</select>
+      </div>
+      <div class="form-group"><label>Serial ID (auto-generated)</label>
+        <input id="ff-serial" value="${autoSerial}" ${item?'readonly':''} style="font-family:var(--mono);letter-spacing:0.04em">
+      </div>
+      <div class="form-group"><label>Status</label>
+        <select id="ff-status">${statuses.map(s=>`<option${v.status===s?' selected':''}>${s}</option>`).join('')}</select>
+      </div>
+      <div class="form-group"><label>Assembly date</label>
+        <input id="ff-date" type="date" value="${v.assemblyDate||''}">
+      </div>
+      <div class="form-group"><label>Colour / finish</label>
+        <select id="ff-colour">
+          <option value="Black"${(v.colour||'Black')==='Black'?' selected':''}>Black</option>
+          <option value="White"${v.colour==='White'?' selected':''}>White</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Purpose *</label>
+        <select id="ff-purpose">
+          <option value="For sale"${(v.purpose||'For sale')==='For sale'?' selected':''}>For sale</option>
+          <option value="Demo"${v.purpose==='Demo'?' selected':''}>Demo</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Current location</label>
+        <input id="ff-location" value="${v.location||''}" placeholder="e.g. Office, Client site">
+      </div>
+      <div class="form-group"><label>Warranty expiry</label>
+        <input id="ff-warranty" type="date" value="${v.warrantyExpiry||''}">
+      </div>
+      <div class="form-group full"><label>Internal notes</label>
+        <textarea id="ff-notes-int">${v.notesInternal||''}</textarea>
+      </div>
+      <div class="form-group full"><label>Customer-facing notes</label>
+        <textarea id="ff-notes-ext">${v.notesExternal||''}</textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn primary" onclick="saveFinItem('${item?item.serial:''}')">${item ? 'Save changes' : 'Add unit'}</button>
+    </div>
+  </div>`;
+}
+
+function generateSerial(productId) {
+  const now = new Date();
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const yy = String(now.getFullYear()).slice(-2);
+  const prefix = `${productId}-${mm}${yy}-`;
+  // Find next 10-digit number not already used
+  let num = 1;
+  while (usedSerials.has(`${prefix}${String(num).padStart(10,'0')}`)) num++;
+  return `${prefix}${String(num).padStart(10,'0')}`;
+}
+
+function updateAutoSerial() {
+  const sel = document.getElementById('ff-product');
+  if (!sel) return;
+  const field = document.getElementById('ff-serial');
+  if (field && !field.readOnly) field.value = generateSerial(sel.value);
+}
+
+function openAddFin() { showModal(finFormHTML(null)); }
+function openEditFin(serial) { showModal(finFormHTML(finItems.find(i => i.serial === serial))); }
+
+async function saveFinItem(existingSerial) {
+  const serial = document.getElementById('ff-serial').value.trim();
+  const productId = document.getElementById('ff-product').value;
+  if (!serial) { alert('Serial ID is required.'); return; }
+  const purpose = document.getElementById('ff-purpose').value;
+  if (!purpose) { alert('Purpose (Demo or For sale) is required.'); return; }
+  const data = {
+    serial, productId,
+    status: document.getElementById('ff-status').value,
+    assemblyDate: document.getElementById('ff-date').value,
+    colour: document.getElementById('ff-colour').value,
+    purpose,
+    location: document.getElementById('ff-location').value.trim(),
+    warrantyExpiry: document.getElementById('ff-warranty').value,
+    notesInternal: document.getElementById('ff-notes-int').value.trim(),
+    notesExternal: document.getElementById('ff-notes-ext').value.trim(),
+    lastModified: new Date().toISOString().split('T')[0],
+  };
+  if (existingSerial) {
+    const idx2 = finItems.findIndex(i => i.serial === existingSerial);
+    if (idx2 > -1) finItems[idx2] = data;
+  } else {
+    finItems.push(data);
+    usedSerials.add(serial);
+  }
+  closeModal();
+  renderFin();
+  await saveFinToExcel();
+  showToast('Unit saved to SharePoint');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+// Disabled until MSAL is ready
+let msalReady = false;
+let msalInstance = null;
+
+async function signIn() {
+  if (!msalReady) { showToast('Still loading, please wait a moment...', true); return; }
+  try {
+    const result = await msalInstance.loginPopup({ scopes: SCOPES });
+    msalInstance.setActiveAccount(result.account);
+    await initApp(result.account);
+  } catch(e) { showToast('Sign-in failed: ' + e.message, true); }
+}
+
+async function signOut() {
+  await msalInstance.logoutPopup();
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app-screen').style.display = 'none';
+}
+</script>
+
+<script>
+// Load MSAL with fallback CDNs
+const MSAL_CDNS = [
+  'https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.27.0/lib/msal-browser.min.js',
+  'https://unpkg.com/@azure/msal-browser@3.27.0/lib/msal-browser.min.js',
+  'https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js',
+];
+
+function setAuthMsg(msg) {
+  const el = document.querySelector('.auth-card .desc');
+  if (el) el.textContent = msg;
+}
+
+function loadScript(url) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = url;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+async function loadMsal() {
+  for (const url of MSAL_CDNS) {
+    try {
+      await loadScript(url);
+      if (window.msal) { await initMsal(); return; }
+    } catch(e) { /* try next */ }
+  }
+  setAuthMsg('Could not load the Microsoft sign-in library. Please make sure you are connected to the internet and reload the page.');
+}
+
+async function initMsal() {
+  try {
+    msalInstance = new msal.PublicClientApplication({
+      auth: {
+        clientId: CLIENT_ID,
+        authority: `https://login.microsoftonline.com/${TENANT_ID}`,
+        redirectUri: 'https://albabipd.github.io/General/',
+      },
+      cache: { cacheLocation: 'sessionStorage' }
+    });
+    await msalInstance.initialize();
+    msalReady = true;
+    setAuthMsg('Ready. Sign in with your Microsoft 365 account to access your inventory.');
+    const btn = document.querySelector('.ms-btn');
+    if (btn) btn.style.opacity = '1';
+    // Auto sign-in if session exists
+    const accounts = msalInstance.getAllAccounts();
+    if (accounts.length > 0) {
+      msalInstance.setActiveAccount(accounts[0]);
+      await initApp(accounts[0]);
+    }
+  } catch(e) {
+    setAuthMsg('Initialization error: ' + e.message);
+  }
+}
+
+loadMsal();
+</script>
+
+
+</body></html>
